@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Doppelgänger</title>
+  <script src="index.js"></script>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+
+<body>
+  <h1>AI Doppelgänger</h1>
+  <p>Your Personalized AI Assistant</p>
+
+  <nav>
+    <button onclick="showTab('train')">Train AI Model</button>
+    <button onclick="showTab('generate')">Generate Text</button>
+    <button onclick="showTab('manage')">Manage Writing Samples</button>
+    <button onclick="showTab('save')">Save AI Model</button>
+  </nav>
+
+  <main>
+    <!-- Train AI Model tab -->
+    <section id="train">
+      <h2>Train Your AI Model</h2>
+      <p>Upload your writing samples below to train your AI Doppelgänger.</p>
+
+      <input type="file" id="fileInput" multiple />
+      <button onclick="handleFileUpload()">Upload Writing Sample(s)</button>
+      <div id="fileList"></div>
+      <button onclick="submitSamples()">Submit Samples</button>
+    </section>
+
+    <!-- Generate Text tab -->
+    <section id="generate" style="display:none;">
+      <h2>Generate Text</h2>
+      <p>Enter a prompt to have your AI Doppelgänger write in your style. Please make sure to train your AI model first.</p>
+
+      <textarea id="promptInput"rows="5" cols="50" placeholder="Type your prompt here..."></textarea><br />
+      <button onclick="generateText()">Generate</button>
+
+      <div id="aiOutput"></div>
+      <button onclick="copyOutput()">Copy Text</button>
+    </section>
+
+    <!-- Manage Writing Samples tab -->
+    <section id="manage" style="display:none;">
+      <h2>Manage Writing Samples</h2>
+      <p>Below are the samples stored in your database. These are the samples your AI model has trained off of.</p>
+      <div id="sampleList"></div>
+      <button onclick="retrainModel()">Confirm Edits & Retrain</button>
+    </section>
+
+    <!-- Save AI Model tab -->
+    <section id="save" style="display:none;">
+      <h2>Save Your AI Model</h2>
+      <p>
+        Save your AI Doppelgänger locally so you don’t need to retrain it every time you open the app.
+      </p>
+
+      <p>
+        <strong>Warning:</strong> Your model may contain personal data from your writing. Be cautious when exporting.
+      </p>
+
+      <button onclick="saveModel()">Save Personalized AI Doppelgänger</button>
+      <div id="saveMessage"></div>
+    </section>
+  </main>
+</body>
+</html>
