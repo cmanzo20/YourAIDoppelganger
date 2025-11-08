@@ -25,9 +25,8 @@
       <h2>Train Your AI Model</h2>
       <p>Upload your writing samples below to train your AI Doppelgänger.</p>
 
-      <input type="file" id="fileInput" multiple />
-      <button onclick="handleFileUpload()">Upload Writing Sample(s)</button>
-      <div id="fileList"></div>
+      <input type="file" id="fileInput" multiple onchange="handleFileUpload()"/> <!--must update every time file list is changed-->
+      <div id="fileList"></div> 
       <button onclick="submitSamples()">Submit Samples</button>
     </section>
 
