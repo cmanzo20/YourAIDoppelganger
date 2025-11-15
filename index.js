@@ -14,15 +14,11 @@ let writingSamples = [];  //variable for storing uploaded files
 function handleFileUpload() {
   const fileInput = document.getElementById('fileInput');
   const files = Array.from(fileInput.files);  //convert uploaded files to JS array
-  
+
   for (let file of files) { //loop through uploaded files
     writingSamples.push(file); //add files to writing samples list
-    const div = document.createElement('div');  //instantiate new div for each doc
-    div.textContent = file.name;  //display the name of the file in text content
-    fileList.appendChild(div);  //append div to file list display
+    displayFileList();  //update file list display
   }
-
-  displayFileList();
 }
 
 // Display files on the page with Remove buttons
@@ -54,7 +50,6 @@ function displayFileList() {
     ul.appendChild(li); //append list item to list
     li.appendChild(nameSpan); //append file name
     li.appendChild(removeBtn);  //append corresponding remove button
-    
   });
 
   fileList.appendChild(ul); //append current upload list to file list div
@@ -66,15 +61,43 @@ function removeFile(index) {
   displayFileList();  //update file display after removal
 }
 
-function submitSamples() {
+async function submitSamples(event) {
+  event.preventDefault(); //prevent default form submission behavior
   console.log("Submitting writing samples:", writingSamples);
   if (writingSamples.length === 0) {
     alert("Please upload at least one writing sample.");
     return;
   }
-  document.getElementById('fileList').innerHTML = "Training your AI Doppelgänger... ⏳";
-  // ADD LOGIC TO TRAIN AI HERE
-  document.getElementById('fileList').innerHTML = "<strong>Your AI Doppelgänger is ready for use!</strong>";
+  const trainMessageDiv = document.getElementById('trainMessage');
+  trainMessageDiv.innerHTML = "Training your AI Doppelgänger... ⏳";
+
+  try { //try-catch block for uploading writing samples
+    for (const file of writingSamples) {  //separate post method for each file
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("http://127.0.0.1:5000/upload", {  //API call
+        method: "POST", //post method
+        body: formData  //data for post method
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to upload ${file.name}`);
+      }
+
+      //log if uploaded successfully
+      const data = await response.json();
+      console.log("Uploaded:", data);
+    }
+
+    // Clear local list after successful upload
+    writingSamples = [];
+    displayFileList();
+
+    trainMessageDiv.innerHTML = "<strong>Your AI Doppelgänger is ready for use!</strong>";
+
+  } catch (error) {
+    console.error(error);
+    alert("Error uploading files. Check console for details.");
+  }
 }
-
-
