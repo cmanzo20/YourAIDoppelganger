@@ -61,8 +61,7 @@ function removeFile(index) {
   displayFileList();  //update file display after removal
 }
 
-async function submitSamples(event) {
-  event.preventDefault(); //prevent default form submission behavior
+async function submitSamples() {
   console.log("Submitting writing samples:", writingSamples);
   if (writingSamples.length === 0) {
     alert("Please upload at least one writing sample.");
