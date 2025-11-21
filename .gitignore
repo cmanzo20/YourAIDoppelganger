@@ -1,0 +1,17 @@
+# Ignore LLM model files (keep them local)
+backend/LLMmodels/*.gguf
+
+# Ignore uploaded writing samples
+uploads/
+
+# Ignore local SQLite database
+writing_samples.db
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore environment files
+.env
+venv/
