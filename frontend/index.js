@@ -5,6 +5,10 @@ function showTab(tabId) {
   document.getElementById('manage').style.display = 'none';
   document.getElementById('save').style.display = 'none';
   document.getElementById(tabId).style.display = 'block';
+
+  if (tabId === "manage") {
+    loadSamples();
+  }
 }
 
 // Writing samples functionality
@@ -159,4 +163,61 @@ function copyOutput() { // Copy to clipboard function
     console.error("Copy failed:", err);
     alert("Failed to copy.");
   }
+}
+
+// Fetch all samples from backend and render in sampleList div
+function loadSamples() {
+  fetch('http://127.0.0.1:5000/samples')
+    .then(response => response.json())
+    .then(samples => {
+      const listDiv = document.getElementById("sampleList");
+      listDiv.innerHTML = "";
+
+      if (samples.length === 0) {
+        listDiv.innerHTML = "<p>No writing samples uploaded yet.</p>";
+        return;
+      }
+
+      samples.forEach(sample => {
+        const sampleDiv = document.createElement("div");
+        sampleDiv.style.marginBottom = "8px";
+
+        sampleDiv.innerHTML = `
+          <span>${sample.filename}</span>
+          <button onclick="deleteSample(${sample.id})" style="margin-left: 10px;">Delete</button>
+        `;
+
+        listDiv.appendChild(sampleDiv);
+      });
+    })
+    .catch(err => {
+      console.error("Error loading samples:", err);
+      document.getElementById("sampleList").innerHTML = "<p>Error loading samples.</p>";
+    });
+}
+
+function deleteSample(sampleId) {
+  if (!confirm("Are you sure you want to delete this sample?")) return;
+
+  fetch(`http://127.0.0.1:5000/delete_sample/${sampleId}`, {
+    method: 'DELETE'
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.error) {
+      alert("Error deleting sample: " + data.error);
+    } else {
+      // Show deleted message
+      const listDiv = document.getElementById("sampleList");
+      const deletedDiv = listDiv.querySelector(`button[onclick="deleteSample(${sampleId})"]`).parentElement;
+      deletedDiv.innerHTML = "<span style='color:green;'>Deleted!</span>";
+
+      // Refresh list after 1 second
+      setTimeout(loadSamples, 1000);
+    }
+  })
+  .catch(err => {
+    console.error("Delete failed:", err);
+    alert("Failed to delete sample");
+  });
 }

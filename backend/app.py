@@ -88,6 +88,28 @@ def get_samples():
     samples = WritingSample.query.all()
     return jsonify([s.serialize() for s in samples])
 
+@app.route('/delete_sample/<int:sample_id>', methods=['DELETE'])
+def delete_sample(sample_id):
+    sample = WritingSample.query.get(sample_id)
+    if not sample:
+        return jsonify({'error': 'Sample not found'}), 404
+
+    # Delete the file from disk
+    try:
+        if os.path.exists(sample.filepath):
+            os.remove(sample.filepath)
+    except Exception as e:
+        print(f"Error deleting file: {e}")
+
+    # Delete from database
+    db.session.delete(sample)
+    db.session.commit()
+
+    # Rebuild the user style profile anytime a sample is deleted
+    rebuild_user_style_profile()
+
+    return jsonify({'message': 'Sample deleted successfully', 'id': sample_id})
+
 @app.route('/generate', methods=['POST'])
 def generate_text():
     data = request.json
