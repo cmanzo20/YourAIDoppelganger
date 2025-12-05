@@ -136,3 +136,27 @@ async function generateText() {
   }
 }
 
+function copyOutput() { // Copy to clipboard function
+  const outputDiv = document.getElementById("aiOutput");
+  const text = outputDiv.innerText;
+  const copyMessageDiv = document.getElementById("copyMessage");
+
+  if (!text.trim()) {
+      copyMessageDiv.textContent = "No text to copy.";
+      copyMessageDiv.style.color = "red";
+      setTimeout(() => {copyMessageDiv.textContent = "";}, 2000);
+      return;
+  }
+
+  try {
+    navigator.clipboard.writeText(text) //copy text to clipboard
+    .then(() => {
+      copyMessageDiv.textContent = "Text copied to clipboard!";
+      copyMessageDiv.style.color = "green";
+      setTimeout(() => {copyMessageDiv.textContent = "";}, 2000);
+    })
+  } catch (err) {
+    console.error("Copy failed:", err);
+    alert("Failed to copy.");
+  }
+}
