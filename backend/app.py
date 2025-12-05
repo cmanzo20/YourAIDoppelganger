@@ -68,10 +68,17 @@ def generate_text():
     if not prompt:
         return jsonify({'error': 'No prompt provided'}), 400
 
-    # Call the LLaMA model
-    response = llm(prompt, max_tokens=200, temperature=0.7)
-    return jsonify({'output': response['text']})
+    chat_prompt = f"<s><|user|>\n{prompt}</s>\n<|assistant|>"
 
+    response = llm(chat_prompt, max_tokens=200, temperature=0.7)
+
+    try:
+        output = response["choices"][0]["text"]
+    except Exception as e:
+        print("Bad LLM response:", response)
+        return jsonify({'error': 'Unexpected LLM response format'}), 500
+
+    return jsonify({'output': output})
 
 # --- Initialize DB ---
 with app.app_context():

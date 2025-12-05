@@ -100,3 +100,39 @@ async function submitSamples() {
     alert("Error uploading files. Check console for details.");
   }
 }
+
+async function generateText() {
+  const prompt = document.getElementById("promptInput").value.trim();
+  const outputDiv = document.getElementById("aiOutput");
+
+  outputDiv.textContent = "Generating response...";
+
+  if (!prompt) {
+    outputDiv.textContent = "Please enter a prompt.";
+    return;
+  }
+
+  try {
+    const res = await fetch("http://127.0.0.1:5000/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ prompt })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      outputDiv.textContent =
+        err.error || `Server error: ${res.status}`;
+      return;
+    }
+
+    const data = await res.json();
+    outputDiv.textContent = data.output || "(No response text returned)";
+  } catch (error) {
+    console.error("Error calling /generate:", error);
+    outputDiv.textContent = "Failed to contact backend.";
+  }
+}
+
