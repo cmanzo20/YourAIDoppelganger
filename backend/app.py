@@ -36,6 +36,30 @@ class WritingSample(db.Model):
 UPLOAD_FOLDER = os.path.join(basedir, 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# var used for storing user style profile
+user_style_profile = ""
+
+def rebuild_user_style_profile():
+    global user_style_profile
+    combined_text = ""
+
+    # Read all writing samples from DB and combine their text
+    samples = WritingSample.query.all()
+    for sample in samples:
+        try:
+            with open(sample.filepath, "r", encoding="utf-8", errors="ignore") as f:
+                combined_text += f.read() + "\n\n"
+        except Exception as e:
+            print(f"Error reading {sample.filepath}: {e}")
+
+    # Limit size for smaller LLM models- not necessary for larger models
+    MAX_CHAR = 6000
+    if len(combined_text) > MAX_CHAR:
+        combined_text = combined_text[-MAX_CHAR:]  # take the most recent writing
+
+    user_style_profile = combined_text
+    print("User style profile rebuilt. Length:", len(user_style_profile))
+
 # --- Routes ---
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -54,6 +78,9 @@ def upload_file():
     db.session.add(sample)
     db.session.commit()
 
+    # Rebuild user style profile after every upload
+    rebuild_user_style_profile()
+
     return jsonify({'message': 'File uploaded successfully', 'file': sample.serialize()}), 200
 
 @app.route('/samples', methods=['GET'])
@@ -68,8 +95,26 @@ def generate_text():
     if not prompt:
         return jsonify({'error': 'No prompt provided'}), 400
 
-    chat_prompt = f"<s><|user|>\n{prompt}</s>\n<|assistant|>"
+    global user_style_profile
+    style_text = user_style_profile or "You have no writing samples yet."
 
+    # Build prompt with style conditioning
+    chat_prompt = f"""
+    <s><|user|>
+    The following is a collection of my writing samples. Learn my tone, voice, sentence structure, style, vocabulary, 
+    and any other data you can use to mimc my writing style.:
+    \"\"\" 
+    {style_text}
+    \"\"\"
+    Now respond to the next prompt in my writing style as if you were me.:
+
+    {prompt}
+    </s>
+    <|assistant|>
+    """
+
+    # Debug: print the user style profile length
+    # print(user_style_profile)   
     response = llm(chat_prompt, max_tokens=200, temperature=0.7)
 
     try:
