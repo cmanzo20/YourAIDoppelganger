@@ -16,7 +16,6 @@
     <button onclick="showTab('train')">Train AI Model</button>
     <button onclick="showTab('generate')">Generate Text</button>
     <button onclick="showTab('manage')">Manage Writing Samples</button>
-    <button onclick="showTab('save')">Save AI Model</button>
   </nav>
 
   <main>
@@ -51,21 +50,9 @@
       <div id="sampleList"></div>
       <button onclick="retrainModel()">Confirm Edits & Retrain</button>
     </section>
-
-    <!-- Save AI Model tab -->
-    <section id="save" style="display:none;">
-      <h2>Save Your AI Model</h2>
-      <p>
-        Save your AI Doppelgänger locally so you don’t need to retrain it every time you open the app.
-      </p>
-
-      <p>
-        <strong>Warning:</strong> Your model may contain personal data from your writing. Be cautious when exporting.
-      </p>
-
-      <button onclick="saveModel()">Save Personalized AI Doppelgänger</button>
-      <div id="saveMessage"></div>
-    </section>
+    <p>
+      <strong>Warning:</strong> Your model may contain personal data from your writing. Be cautious when exporting.
+    </p>
   </main>
 </body>
 </html>
